@@ -14,6 +14,34 @@ namespace twopointzero.Validation
             return validatorInstance;
         }
 
+        public static ValidatorInstance HasLengthInclusive(this ValidatorInstance self, string actualValue,
+                                                           string paramName, int minimumLength, int maximumLength)
+        {
+            return self.HasLengthInclusive(actualValue, paramName, minimumLength, maximumLength, null);
+        }
+
+        public static ValidatorInstance HasLengthInclusive(this ValidatorInstance self, string actualValue,
+                                                           string paramName, int minimumLength, int maximumLength,
+                                                           string message)
+        {
+            if (actualValue == null)
+            {
+                return self.IsNotNull(actualValue, paramName, message);
+            }
+
+            if (actualValue.Length < minimumLength || actualValue.Length > maximumLength)
+            {
+                return
+                    self.Add(new ArgumentOutOfRangeException(paramName, actualValue,
+                                                             message ??
+                                                             string.Format(
+                                                                 "Expected a string of between {0} and {1} characters inclusive.",
+                                                                 minimumLength, maximumLength)));
+            }
+
+            return self;
+        }
+
         public static ValidatorInstance IsEqualTo<T>(this ValidatorInstance self, T actualValue, string paramName,
                                                      T expectedValue) where T : class
         {
@@ -32,6 +60,27 @@ namespace twopointzero.Validation
                 return
                     self.Add(new ArgumentOutOfRangeException(paramName, actualValue,
                                                              message ?? "Expected: " + expectedValue));
+            }
+
+            return self;
+        }
+
+        public static ValidatorInstance IsLessThan(this ValidatorInstance self, byte actualValue, string paramName,
+                                                   byte expectedValue)
+        {
+            return self.IsLessThan(actualValue, paramName, expectedValue, null);
+        }
+
+        public static ValidatorInstance IsLessThan(this ValidatorInstance self, byte actualValue, string paramName,
+                                                   byte expectedValue, string message)
+        {
+            if (actualValue >= expectedValue)
+            {
+                return
+                    self.Add(new ArgumentOutOfRangeException(paramName, actualValue,
+                                                             message ??
+                                                             string.Format("Expected a value less than {0}.",
+                                                                           expectedValue)));
             }
 
             return self;
